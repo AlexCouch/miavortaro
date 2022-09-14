@@ -30,9 +30,9 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
 
     div{
         //Ĉi tiu enhavas vicojn kiuj enhavas la partojn de la tuta formo.
-        //Vico unua: La 'eks' marko
+        //Vico unua: La 'eks' marko kaj la titlo
         //Vico dua: La enmetejo por la vorto
-        //Vico tria: La priskribo de la vorto
+        //Vico tria: La enmetejo por la priskribo de la vorto
         //Vico kvara: La butono por sendi la vorton al la servo
         id = "aldoniVorton"
         css{
@@ -61,11 +61,20 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
                 height = 75.pct
             }
             div{
+
                 //Jen la vico unua, en kiu ekzistas la 'eks' marko por fermi la formon
                 css(ClassName("flex-container")){
                     width = 100.pct
                     display = Display.flex
-                    placeContent = PlaceContent.flexEnd
+                    placeContent = PlaceContent.spaceBetween
+                }
+                span{}
+                p{
+                    +"Aldoni vorton"
+                    css{
+                        color = Color(Colors.primaryFg)
+                        fontSize = 24.px
+                    }
                 }
                 i{
                     css(ClassName("fa fa-close")){
@@ -76,8 +85,13 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
                         float = Float.right
                         width = 1.em
                         height = 1.em
+                        hover{
+                            color = Color(Colors.buttonHover)
+                        }
                     }
                     onClick = {
+                        ĝisdatigiVorton("")
+                        ĝisdatigiPriskribon("")
                         props.jeFermu()
                     }
                 }
@@ -103,7 +117,7 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
                     jeŜanĝo = {
                         ĝisdatigiPriskribon(it)
                     }
-                    etikedo = "Priskribi"
+                    etikedo = "Priskribo"
                     larĝo = 50.pct
                 }
             }
@@ -119,14 +133,18 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
                         backgroundColor = Color(Colors.onPrimaryBg)
                         border = Border(1.px, LineStyle.solid, Color(Colors.highlight))
                         borderRadius = 1.em
+                        marginBottom = 10.px
                         hover{
-
+                            boxShadow = BoxShadow(0.`in`, 0.`in`, 1.em, Color(Colors.highlight))
                         }
                     }
                     +"Aldoni"
 
                     onClick = {
+                        ĝisdatigiVorton("")
+                        ĝisdatigiPriskribon("")
                         props.AldoniVortonFunc(vorto, priskribo)
+                        props.jeFermu()
                     }
                 }
             }

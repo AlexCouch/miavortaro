@@ -30,10 +30,13 @@ val Enmetejo = FC<Enmetejaĵoj>{ aĵoj ->
                 margin = aĵoj.margin
                 backgroundColor = Color(Colors.secondaryBg)
                 paddingLeft = 8.px
-                color = Color(Colors.onPrimaryBg)
+                color = Color(Colors.secondaryFg)
                 placeholder {
                     color = Color(Colors.secondaryFg)
                 }
+            }
+            onChange = {
+                aĵoj.jeŜanĝo(it.currentTarget.value)
             }
             placeholder = aĵoj.etikedo
             type = InputType.text

@@ -65,9 +65,22 @@ val App = FC<Props>{
             jeFermu = {
                 shouldShowAddWordModal(false)
             }
-            AldoniVortonFunc = { vorto, priparolo ->
-                //TODO: Aldonu la vorto al la servo
-                println("Aldonita! $vorto -> $priparolo")
+            AldoniVortonFunc = { vorto, priskribo ->
+                mainScope.launch{
+                    httpClient.post("/"){
+                        headers{
+                            contentType(ContentType.Application.Json)
+                        }
+                        setBody(WordEntry(vorto, priskribo))
+                    }.let{ response ->
+                        if(response.status != HttpStatusCode.OK){
+                            //TODO: Aldoni logikon per kiu oni scius ke eraro okazis
+                            println("Error occurred: ${response.status}")
+                        }else{
+                            getAllWords(updateWords)
+                        }
+                    }
+                }
             }
         }
         Header{

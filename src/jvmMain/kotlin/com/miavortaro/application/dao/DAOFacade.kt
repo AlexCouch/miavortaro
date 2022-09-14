@@ -2,6 +2,7 @@ package com.miavortaro.application.dao
 
 import WordEntry
 import com.miavortaro.application.model.WordEntryCache
+import kotlinx.coroutines.selects.select
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.Closeable
@@ -10,6 +11,8 @@ interface DAOFacade : Closeable{
     fun init()
 
     fun createWord(word: String, definition: String): String
+
+    fun queryWord(word: String, definition: String): Boolean
 
     fun getWord(word: String): WordEntryCache
 
@@ -33,11 +36,23 @@ class DAOFacadeDatabase(
         }
     }
 
+    override fun queryWord(word: String, definition: String): Boolean = transaction(db){
+        WordEntries.select {
+            exists(WordEntries.select{
+                (WordEntries.word eq word) and (WordEntries.definition eq definition)
+            })
+        }.any()
+    }
+
     override fun createWord(word: String, definition: String): String = transaction(db){
-        WordEntries.insert {
-            it[WordEntries.word] = word
-            it[WordEntries.definition] = definition
-        } get WordEntries.word
+        if(!queryWord(word, definition)){
+            WordEntries.insert {
+                it[WordEntries.word] = word
+                it[WordEntries.definition] = definition
+            } get WordEntries.word
+        }else{
+            word
+        }
     }
 
     override fun getWord(word: String): WordEntryCache = transaction(db){

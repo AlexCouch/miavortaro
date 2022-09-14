@@ -6,4 +6,6 @@ object Colors{
 
     val primaryFg = "#bbc9be"
     val secondaryFg = "#9dc2a7"
+
+    val buttonHover = "#7bab85"
 }

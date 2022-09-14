@@ -9,6 +9,9 @@ import io.ktor.server.application.*
 import io.ktor.server.freemarker.*
 import io.ktor.server.html.*
 import io.ktor.server.locations.*
+import io.ktor.server.locations.delete
+import io.ktor.server.locations.post
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.html.*
@@ -58,5 +61,17 @@ fun Routing.index(){
                 }
             }
         }
+    }
+    post<Index>{
+        call.receive<WordEntry>().let {
+            dao.createWord(it.word, it.definition)
+        }
+        call.respond(HttpStatusCode.OK)
+    }
+    delete<Index> {
+        call.receive<String>().let {
+            dao.deleteWord(it)
+        }
+        call.respond(HttpStatusCode.OK)
     }
 }
