@@ -37,16 +37,16 @@ val Header = FC<HeaderProps>{ props ->
             }
             larĝo = 50.pct
             etikedo = "Serĉi..."
+            centra = true
+
         }
-        span{
-            css(ClassName("fa fa-plus")){
-                color = Color(Colors.secondaryFg)
-                marginRight = 2.em
-                cursor = Cursor.pointer
-            }
-            onClick = {
+        MVButono{
+            icon = "fa fa-plus"
+            fontSize = 1.em
+            jeAlklako = {
                 props.onButtonClick(Buttons.AldoniButono, true)
             }
+            margin = Margin(top = 0.px, bottom = 0.px, right = 1.em, left = 0.px)
         }
     }
 }

@@ -12,14 +12,16 @@ external interface Enmetejaĵoj: Props{
     var larĝo: Length
     var etikedo: String
     var margin: Margin
+    var centra: Boolean
+    var defaŭltaValoro: String
 }
 
 val Enmetejo = FC<Enmetejaĵoj>{ aĵoj ->
     form{
         css(ClassName("flex-container")){
             display = Display.flex
-            justifyContent = JustifyContent.center
-            alignContent = AlignContent.center
+            justifyContent = if(aĵoj.centra) JustifyContent.center else JustifyContent.normal
+            alignContent = if(aĵoj.centra) AlignContent.center else AlignContent.normal
             width = 100.pct
         }
         input{
@@ -38,6 +40,7 @@ val Enmetejo = FC<Enmetejaĵoj>{ aĵoj ->
             onChange = {
                 aĵoj.jeŜanĝo(it.currentTarget.value)
             }
+            value = aĵoj.defaŭltaValoro
             placeholder = aĵoj.etikedo
             type = InputType.text
         }

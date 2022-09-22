@@ -10,19 +10,21 @@ import react.dom.html.ReactHTML.ul
 
 external interface WordListProps: Props {
     var words: List<WordEntry>
+    var onWordClick: (WordEntry) -> Unit
 }
 
 val WordList = FC<WordListProps>{ props ->
     div{
         css {
             backgroundColor = Color(Colors.secondaryBg)
-            width = 100.pct
+            width = 50.pct
             height = 100.pct - 3.em
             marginTop = 3.em
+//            marginRight = 5.pct
         }
         if(props.words.isNotEmpty()) {
             ul {
-                props.words.forEach {
+                props.words.forEach { word ->
                     li {
                         css {
                             listStyle = None.none
@@ -41,16 +43,19 @@ val WordList = FC<WordListProps>{ props ->
                             }
                         }
                         h1 {
-                            +it.word
+                            +word.word
                             css {
                                 color = Color(Colors.primaryFg)
                             }
                         }
                         p {
-                            +(if (it.definition.length > 100) it.definition.slice(0..100) else it.definition)
+                            +(if (word.definition.length > 100) word.definition.slice(0..100) else word.definition)
                             css {
                                 color = Color(Colors.primaryFg)
                             }
+                        }
+                        onClick = {
+                            props.onWordClick(word)
                         }
                     }
                 }

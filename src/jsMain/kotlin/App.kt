@@ -25,8 +25,11 @@ val httpClient = HttpClient{
 
 val mainScope = MainScope()
 
-enum class AppState{
-    Load, Vortoj, Aretoj
+sealed class AppState{
+    object Load: AppState()
+    object Vortoj: AppState()
+    object Aretoj: AppState()
+    data class Error(val code: HttpStatusCode, val message: String): AppState()
 }
 
 suspend fun searchWord(word: String, setWords: StateSetter<List<WordEntry>>){
@@ -51,6 +54,9 @@ val App = FC<Props>{
     val (appState, updateAppState) = useState<AppState>(AppState.Load)
     val (words, updateWords) = useState<List<WordEntry>>(emptyList())
     val (showAddWordModal, shouldShowAddWordModal) = useState<Boolean>(false)
+    val (vidiVorton, jaViduVorton) = useState<Boolean>(false)
+    val (vortoPorVidi, metuVortonPorMontri) = useState<WordEntry>()
+    val (ŝanĝiVorton, metuŜanĝiVorton) = useState<Boolean>(false)
 
     div{
         css(ClassName("flex-container")){
@@ -74,8 +80,7 @@ val App = FC<Props>{
                         setBody(WordEntry(vorto, priskribo))
                     }.let{ response ->
                         if(response.status != HttpStatusCode.OK){
-                            //TODO: Aldoni logikon per kiu oni scius ke eraro okazis
-                            println("Error occurred: ${response.status}")
+                            updateAppState(AppState.Error(response.status, "Ho ve! Io okazis! Pardonu min! Vi povas reprovi poste!"))
                         }else{
                             getAllWords(updateWords)
                         }
@@ -111,18 +116,43 @@ val App = FC<Props>{
             }
         }
         when(appState){
-            AppState.Load -> {
+            is AppState.Load -> {
                 mainScope.launch {
                     getAllWords(updateWords)
                     updateAppState(AppState.Vortoj)
                 }
             }
-            AppState.Vortoj -> {
+            is AppState.Vortoj -> {
                 WordList{
                     this.words = words
+                    onWordClick = {
+                        metuVortonPorMontri(it)
+                        jaViduVorton(true)
+                    }
+                }
+                VidiVorton {
+                    vortoPorVidi?.let {
+                        vorto = it
+                    }
+                    ŝanĝuVorton = ŝanĝiVorton
+                    montruVorton = vidiVorton
+                    jeFermo = {
+                        jaViduVorton(false)
+                        metuŜanĝiVorton(false)
+                    }
+                    malfermuŜanĝejo = {
+                        metuŜanĝiVorton(it)
+                    }
                 }
             }
-            AppState.Aretoj -> Unit
+            is AppState.Aretoj -> Unit
+            is AppState.Error -> {
+                MontruEraro{
+                    code = appState.code
+                    mesaĝo = appState.message
+                }
+            }
         }
+
     }
 }

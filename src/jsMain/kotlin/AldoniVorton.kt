@@ -119,6 +119,7 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
                     }
                     etikedo = "Priskribo"
                     larĝo = 50.pct
+                    margin = Margin(10.px, Auto.auto)
                 }
             }
             div{
