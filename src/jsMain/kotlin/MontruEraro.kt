@@ -12,7 +12,7 @@ external interface MontruEraroAĵoj: Props {
     var mesaĝo: String
 }
 
-val MontruEraro = FC<MontruEraroAĵoj>{ aĵoj ->
+val MontruEraron = FC<MontruEraroAĵoj>{ aĵoj ->
     div{
         css{
             width = 100.pct
@@ -20,9 +20,12 @@ val MontruEraro = FC<MontruEraroAĵoj>{ aĵoj ->
             display = Display.flex
             alignContent = AlignContent.center
             justifyContent = JustifyContent.center
+            backgroundColor = Color(Colors.secondaryBg)
+            flexDirection = FlexDirection.column
+            alignItems = AlignItems.center
         }
         h1{
-            +aĵoj.code.value.toString()
+            +("${aĵoj.code.value}: ${aĵoj.code.description}")
             css{
                 fontSize = 46.px
                 color = Color(Colors.primaryFg)

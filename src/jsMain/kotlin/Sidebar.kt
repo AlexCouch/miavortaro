@@ -63,7 +63,7 @@ val Sidebar = FC<SidebarProps>{ props ->
                     }
                 }
                 onClick = {
-                    props.onMenuSelect("Vortoj")
+                    props.onMenuSelect("Aretoj")
                 }
                 p{
                     +"Aretoj"

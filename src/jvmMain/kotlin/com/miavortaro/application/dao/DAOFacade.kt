@@ -4,6 +4,9 @@ import WordEntry
 import com.miavortaro.application.model.WordEntryCache
 import kotlinx.coroutines.selects.select
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.neq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.notEqSubQuery
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.Closeable
 
@@ -58,7 +61,7 @@ class DAOFacadeDatabase(
     override fun getWord(word: String): WordEntryCache = transaction(db){
         val row = WordEntries.select {
             WordEntries.word.eq(word)
-        }.single()
+        }.first()
         WordEntryCache(word, row[WordEntries.definition])
     }
 

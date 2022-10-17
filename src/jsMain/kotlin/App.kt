@@ -7,15 +7,9 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.js.TimeStamp
-import kotlinx.js.timers.setInterval
 import react.*
 import react.dom.html.ReactHTML.div
-import kotlin.js.Date
-import kotlin.math.abs
-import kotlin.time.Duration.Companion.seconds
 
 val httpClient = HttpClient{
     install(ContentNegotiation){
@@ -50,64 +44,71 @@ suspend fun getAllWords(setWords: StateSetter<List<WordEntry>>){
     }
 }
 
+suspend fun addOrUpdateWord(word: WordEntry, updateAppState: StateSetter<AppState>, updateWords: StateSetter<List<WordEntry>>){
+    httpClient.post("/"){
+        headers{
+            contentType(ContentType.Application.Json)
+        }
+        setBody(word)
+    }.let { response ->
+        if (response.status != HttpStatusCode.OK) {
+            updateAppState(AppState.Error(response.status, "Ho ve! Io okazis! Pardonu min! Vi povas reprovi poste!"))
+        } else {
+            getAllWords(updateWords)
+        }
+    }
+}
+
 val App = FC<Props>{
     val (appState, updateAppState) = useState<AppState>(AppState.Load)
     val (words, updateWords) = useState<List<WordEntry>>(emptyList())
     val (showAddWordModal, shouldShowAddWordModal) = useState<Boolean>(false)
-    val (vidiVorton, jaViduVorton) = useState<Boolean>(false)
-    val (vortoPorVidi, metuVortonPorMontri) = useState<WordEntry>()
-    val (ŝanĝiVorton, metuŜanĝiVorton) = useState<Boolean>(false)
+    val (showWord, shouldShowWord) = useState<Boolean>(false)
+    val (wordToShow, setWordToShow) = useState<WordEntry>()
+    val (changeWord, setChangeWord) = useState<Boolean>(false)
 
-    div{
-        css(ClassName("flex-container")){
+    div {
+        css(ClassName("flex-container")) {
             display = Display.flex
             position = Position.fixed
             width = 100.pct
             height = 100.pct
             margin = 0.pct
         }
-        AldoniVorton{
+        AldoniVorton {
             show = showAddWordModal
             jeFermu = {
                 shouldShowAddWordModal(false)
             }
             AldoniVortonFunc = { vorto, priskribo ->
-                mainScope.launch{
-                    httpClient.post("/"){
-                        headers{
-                            contentType(ContentType.Application.Json)
-                        }
-                        setBody(WordEntry(vorto, priskribo))
-                    }.let{ response ->
-                        if(response.status != HttpStatusCode.OK){
-                            updateAppState(AppState.Error(response.status, "Ho ve! Io okazis! Pardonu min! Vi povas reprovi poste!"))
-                        }else{
-                            getAllWords(updateWords)
-                        }
-                    }
+                mainScope.launch {
+                    addOrUpdateWord(WordEntry(vorto, priskribo), updateAppState, updateWords)
                 }
             }
         }
-        Header{
+        Header {
             onButtonClick = { button, toggle ->
-                when(button){
+                when (button) {
                     Buttons.AldoniButono -> shouldShowAddWordModal(toggle)
                 }
             }
             onSearchUpdate = { word ->
                 mainScope.launch {
-                    if(word.isEmpty()){
+                    if (word.isEmpty()) {
                         getAllWords(updateWords)
-                    }else{
+                    } else {
                         searchWord(word, updateWords)
                     }
                 }
             }
         }
-        Sidebar{
+        Sidebar {
             onMenuSelect = {
-                when(it){
+                when (it) {
                     "Vortoj" -> {
+                        shouldShowWord(false)
+                        setChangeWord(false)
+                        println("Trying to close the view word window")
                         mainScope.launch {
                             getAllWords(updateWords)
                         }
@@ -115,7 +116,7 @@ val App = FC<Props>{
                 }
             }
         }
-        when(appState){
+        when (appState) {
             is AppState.Load -> {
                 mainScope.launch {
                     getAllWords(updateWords)
@@ -123,31 +124,39 @@ val App = FC<Props>{
                 }
             }
             is AppState.Vortoj -> {
-                WordList{
+                WordList {
                     this.words = words
                     onWordClick = {
-                        metuVortonPorMontri(it)
-                        jaViduVorton(true)
+                        setWordToShow(it)
+                        shouldShowWord(true)
                     }
                 }
-                VidiVorton {
-                    vortoPorVidi?.let {
+                ViewWord {
+                    wordToShow?.let {
+                        println(it)
                         vorto = it
                     }
-                    ŝanĝuVorton = ŝanĝiVorton
-                    montruVorton = vidiVorton
-                    jeFermo = {
-                        jaViduVorton(false)
-                        metuŜanĝiVorton(false)
+                    this.changeWord = changeWord
+                    this.showWord = showWord
+                    onClose = {
+                        shouldShowWord(false)
+                        setChangeWord(false)
                     }
-                    malfermuŜanĝejo = {
-                        metuŜanĝiVorton(it)
+                    closeChangePlace = {
+                        setChangeWord(it)
+                    }
+                    sendChangedWord = { word ->
+                        mainScope.launch {
+                            addOrUpdateWord(word, updateAppState, updateWords)
+                            setWordToShow(word)
+                            setChangeWord(false)
+                        }
                     }
                 }
             }
             is AppState.Aretoj -> Unit
             is AppState.Error -> {
-                MontruEraro{
+                MontruEraron {
                     code = appState.code
                     mesaĝo = appState.message
                 }

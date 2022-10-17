@@ -4,30 +4,28 @@ import react.FC
 import react.Props
 import react.dom.html.ReactHTML.button
 import react.dom.html.ReactHTML.div
-import react.dom.html.ReactHTML.form
 import react.dom.html.ReactHTML.h1
-import react.dom.html.ReactHTML.i
 import react.dom.html.ReactHTML.label
 import react.dom.html.ReactHTML.p
 import react.useState
 
 external interface VidiVortonAĵoj: Props {
     var vorto: WordEntry
-    var montruVorton: Boolean
-    var ŝanĝuVorton: Boolean
-    var sendiŜanĝatanVorton: (WordEntry)->Unit
-    var jeFermo: ()->Unit
-    var malfermuŜanĝejo: (Boolean)->Unit
+    var showWord: Boolean
+    var changeWord: Boolean
+    var sendChangedWord: (WordEntry)->Unit
+    var onClose: ()->Unit
+    var closeChangePlace: (Boolean)->Unit
 }
 
-val VidiVorton = FC<VidiVortonAĵoj>{ aĵoj ->
-    var (novaVorto, metuNovaVorto) = useState<String>("")
-    var (novaPriskribo, metuNovaPriskribo) = useState<String>("")
+val ViewWord = FC<VidiVortonAĵoj>{ aĵoj ->
+    val (novaVorto, metuNovaVorto) = useState<String>("")
+    val (novaPriskribo, metuNovaPriskribo) = useState<String>("")
     div{
         /*
             Aranĝo:
                 1. Titolo, aliaj aĵoj
-                2. Multaj vidoj de la difinioj de la vortoj, se pli ol unu ekzistas
+                2. Multaj vidoj de la difinoj de la vortoj, se pli ol unu ekzistas
                 3. Vorteroj
                 4. Tradukaĵoj
                 5. Diskutado
@@ -40,11 +38,11 @@ val VidiVorton = FC<VidiVortonAĵoj>{ aĵoj ->
             scrollBehavior = ScrollBehavior.smooth
             width = 50.pct
             marginTop = 3.em
-            backgroundColor = if(aĵoj.montruVorton) Color(Colors.primaryBg) else Color(Colors.secondaryBg)
-            border = if(aĵoj.montruVorton) Border(1.px, LineStyle.solid, NamedColor.black) else None.none
-            boxShadow = if(aĵoj.montruVorton) BoxShadow(0.px, 0.px, 1.em, NamedColor.black) else None.none
+            backgroundColor = if(aĵoj.showWord) Color(Colors.primaryBg) else Color(Colors.secondaryBg)
+            border = if(aĵoj.showWord) Border(1.px, LineStyle.solid, NamedColor.black) else None.none
+            boxShadow = if(aĵoj.showWord) BoxShadow(0.px, 0.px, 1.em, NamedColor.black) else None.none
         }
-        if(aĵoj.montruVorton) {
+        if(aĵoj.showWord) {
             div{
                 css{
                     display = Display.flex
@@ -53,16 +51,20 @@ val VidiVorton = FC<VidiVortonAĵoj>{ aĵoj ->
                 }
                 MVButono{
                     icon = "fa fa-angle-double-right"
-                    jeAlklako = aĵoj.jeFermo
+                    jeAlklako = aĵoj.onClose
                     fontSize = 1.5.em
                 }
-                MVButono{
-                    icon = "fa fa-edit"
-                    jeAlklako = {
-                        aĵoj.malfermuŜanĝejo(true)
-                    }
-                    fontSize = 1.5.em
+                if(!aĵoj.changeWord){
+                    MVButono{
+                        icon = "fa fa-edit"
+                        jeAlklako = {
+                            aĵoj.closeChangePlace(true)
+                            metuNovaVorto(aĵoj.vorto.word)
+                            metuNovaPriskribo(aĵoj.vorto.definition)
+                        }
+                        fontSize = 1.5.em
 
+                    }
                 }
             }
             div{
@@ -73,7 +75,7 @@ val VidiVorton = FC<VidiVortonAĵoj>{ aĵoj ->
                     marginLeft = 2.em
                     marginBottom = Auto.auto
                 }
-                if(aĵoj.ŝanĝuVorton){
+                if(aĵoj.changeWord){
                     label{
                         +"Vorto"
                         css{
@@ -85,7 +87,7 @@ val VidiVorton = FC<VidiVortonAĵoj>{ aĵoj ->
                             metuNovaVorto(it)
                         }
                         larĝo = 50.pct
-                        defaŭltaValoro = aĵoj.vorto.word
+                        defaŭltaValoro = novaVorto
                         centra = false
                         margin = Margin(8.px, 0.px)
                     }
@@ -108,13 +110,13 @@ val VidiVorton = FC<VidiVortonAĵoj>{ aĵoj ->
                         margin = 0.px
                     }
                 }
-                if(aĵoj.ŝanĝuVorton){
+                if(aĵoj.changeWord){
                     Enmetejo{
                         jeŜanĝo = {
                             metuNovaPriskribo(it)
                         }
                         larĝo = 50.pct
-                        defaŭltaValoro = aĵoj.vorto.definition
+                        defaŭltaValoro = novaPriskribo
                         centra = false
                         margin = Margin(8.px, 0.px)
                     }
@@ -131,27 +133,45 @@ val VidiVorton = FC<VidiVortonAĵoj>{ aĵoj ->
                     }
                 }
             }
-            div{
-                css{
-                    display = Display.flex
-                    justifyContent = JustifyContent.center
-                    marginBottom = 1.em
-                }
-                button{
+            if(aĵoj.changeWord){
+                div{
                     css{
-                        backgroundColor = Color(Colors.onPrimaryBg)
-                        border = Border(1.px, LineStyle.solid, Color(Colors.highlight))
-                        borderRadius = 1.em
-                        padding = Padding(4.px, 8.px)
-                        hover{
-                            boxShadow = BoxShadow(0.`in`, 0.`in`, 1.em, Color(Colors.highlight))
-                            cursor = Cursor.pointer
+                        display = Display.flex
+                        justifyContent = JustifyContent.center
+                        marginBottom = 1.em
+                    }
+                    button{
+                        css{
+                            backgroundColor = Color(Colors.onPrimaryBg)
+                            border = Border(1.px, LineStyle.solid, Color(Colors.highlight))
+                            borderRadius = 1.em
+                            padding = Padding(4.px, 8.px)
+                            marginRight = 1.em
+                            hover{
+                                boxShadow = BoxShadow(0.`in`, 0.`in`, 1.em, Color(Colors.highlight))
+                                cursor = Cursor.pointer
+                            }
+                        }
+                        +"Ŝanĝi"
+                        onClick = {
+                            aĵoj.sendChangedWord(WordEntry(novaVorto, novaPriskribo))
                         }
                     }
-                    +"Ŝanĝi"
-                    onClick = {
-                        aĵoj.sendiŜanĝatanVorton(WordEntry(novaVorto, novaPriskribo))
-                        aĵoj.malfermuŜanĝejo(false)
+                    button{
+                        css{
+                            backgroundColor = Color(Colors.onPrimaryBg)
+                            border = Border(1.px, LineStyle.solid, Color(Colors.highlight))
+                            borderRadius = 1.em
+                            padding = Padding(4.px, 8.px)
+                            hover{
+                                boxShadow = BoxShadow(0.`in`, 0.`in`, 1.em, Color(Colors.highlight))
+                                cursor = Cursor.pointer
+                            }
+                        }
+                        +"Nuligi"
+                        onClick = {
+                            aĵoj.closeChangePlace(false)
+                        }
                     }
                 }
             }
