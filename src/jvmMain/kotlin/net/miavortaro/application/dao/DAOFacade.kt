@@ -1,7 +1,8 @@
-package com.miavortaro.application.dao
+package net.miavortaro.application.dao
 
+import User
 import WordEntry
-import com.miavortaro.application.model.WordEntryCache
+import net.miavortaro.application.model.WordEntryCache
 import kotlinx.coroutines.selects.select
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -27,15 +28,21 @@ interface DAOFacade : Closeable{
 
     fun deleteWord(word: String)
 
+    fun queryUser(username: String): Boolean
+    fun authUser(user: User): Boolean
+    fun createUser(user: User): Boolean
+    fun deleteUser(user: User): Boolean
+
     fun clear()
 }
 
 class DAOFacadeDatabase(
     val db: Database = Database.connect("jdbc:h2:mem:test", driver = "org.h2.Driver")
-): DAOFacade{
+): DAOFacade {
     override fun init(){
         transaction(db){
             SchemaUtils.create(WordEntries)
+            SchemaUtils.create(UserEntries)
         }
     }
 
@@ -106,8 +113,44 @@ class DAOFacadeDatabase(
         WordEntries.deleteWhere { WordEntries.word.eq(word) }
     }
 
+    override fun queryUser(username: String) = transaction(db) {
+        UserEntries.select {
+            exists(UserEntries.select{
+                UserEntries.username eq username
+            })
+        }.any()
+    }
+
+    override fun authUser(user: User): Boolean = transaction(db) {
+        UserEntries.select {
+            (UserEntries.username eq user.username) and (UserEntries.passwordHashed eq user.passwordHashed)
+        }.any()
+    }
+
+    override fun createUser(user: User): Boolean = transaction(db) {
+        if(queryUser(user.username)){
+            false
+        }else{
+            UserEntries.insert {
+                it[UserEntries.username] = user.username
+                it[UserEntries.passwordHashed] = user.passwordHashed
+            }
+            true
+        }
+    }
+
+    override fun deleteUser(user: User): Boolean = transaction(db) {
+        if(!queryUser(user.username)){
+            false
+        }else{
+            UserEntries.deleteWhere { UserEntries.username.eq(user.username) }
+            true
+        }
+    }
+
     override fun clear(): Unit = transaction(db){
         WordEntries.deleteAll()
+        UserEntries.deleteAll()
     }
 
     override fun close() {

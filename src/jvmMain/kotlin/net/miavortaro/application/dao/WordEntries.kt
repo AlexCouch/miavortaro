@@ -1,4 +1,4 @@
-package com.miavortaro.application.dao
+package net.miavortaro.application.dao
 
 import org.jetbrains.exposed.sql.Table
 

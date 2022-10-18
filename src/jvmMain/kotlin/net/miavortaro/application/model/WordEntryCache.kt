@@ -1,4 +1,4 @@
-package com.miavortaro.application.model
+package net.miavortaro.application.model
 
 import java.io.*
 

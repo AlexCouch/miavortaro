@@ -1,9 +1,9 @@
 @file:OptIn(KtorExperimentalLocationsAPI::class)
 
-package com.miavortaro.application
+package net.miavortaro.application
 
 import WordEntry
-import com.miavortaro.application.dao.DAOFacade
+import net.miavortaro.application.dao.DAOFacade
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.freemarker.*

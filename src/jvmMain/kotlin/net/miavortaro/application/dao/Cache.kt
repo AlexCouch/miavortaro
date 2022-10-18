@@ -1,7 +1,6 @@
-package com.miavortaro.application.dao
+package net.miavortaro.application.dao
 
-import WordEntry
-import com.miavortaro.application.model.WordEntryCache
+import net.miavortaro.application.model.WordEntryCache
 import org.ehcache.config.builders.CacheConfigurationBuilder
 import org.ehcache.config.builders.CacheManagerBuilder
 import org.ehcache.config.builders.ResourcePoolsBuilder
