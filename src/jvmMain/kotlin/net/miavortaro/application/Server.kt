@@ -15,7 +15,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import io.ktor.server.engine.embeddedServer
+import io.ktor.server.engine.*
 import io.ktor.server.freemarker.*
 import io.ktor.server.html.*
 import io.ktor.server.http.content.*
@@ -35,6 +35,7 @@ import io.ktor.utils.io.core.*
 import io.netty.handler.codec.DefaultHeaders
 import kotlinx.html.*
 import org.jetbrains.exposed.sql.Database
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.sql.Date
 import java.sql.Driver
@@ -72,7 +73,8 @@ fun createToken(audience: String, issuer: String, user: User, secret: String): S
         .withAudience(audience)
         .withIssuer(issuer)
         .withClaim("username", user.username)
-        .withExpiresAt(Date(System.currentTimeMillis() + 60000))
+        .withClaim("hashedPassword", user.passwordHashed)
+        .withExpiresAt(Date(System.currentTimeMillis() + (30 * 60 * 1000)))
         .sign(Algorithm.HMAC256(secret))
 
 fun Application.mainWithDependencies(dao: DAOFacade){
@@ -113,6 +115,10 @@ fun Application.mainWithDependencies(dao: DAOFacade){
                     }
                 }
             }
+
+            challenge{ defaultScheme, realm ->
+                call.respond(HttpStatusCode.Unauthorized, "Token is not valid or has expired.")
+            }
         }
     }
 
@@ -142,6 +148,26 @@ fun Application.mainWithDependencies(dao: DAOFacade){
                 val username = principal!!.payload.getClaim("username").asString()
                 val expiresAt = principal.expiresAt?.time?.minus(System.currentTimeMillis())
                 call.respondText("Saluton, $username! La ĵetono eksvalidiĝas post $expiresAt ms.")
+            }
+            post("/admin"){
+                val principal = call.principal<JWTPrincipal>()
+                val username = principal!!.payload.getClaim("username").asString()
+                val password = principal.payload.getClaim("hashedPassword").asString()
+
+                val expiresAt = principal.expiresAt!!.time.minus(System.currentTimeMillis())
+                if(username != "admin"){
+                    call.respond("Nur admino povas atingi ĉi tiun itineron")
+                    return@post
+                }
+                if(expiresAt > 30 * 60 * 1000){
+                    call.respond("Ĵetono eksvalidiĝis")
+                    return@post
+                }
+                if(!dao.authUser(User(username, password))){
+                    call.respond("Admino ne plu aŭtentikigita")
+                    return@post
+                }
+                call.respond(dao.allUsers())
             }
         }
         static("/static"){

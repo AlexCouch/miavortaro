@@ -28,6 +28,7 @@ interface DAOFacade : Closeable{
 
     fun deleteWord(word: String)
 
+    fun allUsers(): List<User>
     fun queryUser(username: String): Boolean
     fun authUser(user: User): Boolean
     fun createUser(user: User): Boolean
@@ -111,6 +112,17 @@ class DAOFacadeDatabase(
 
     override fun deleteWord(word: String): Unit = transaction(db){
         WordEntries.deleteWhere { WordEntries.word.eq(word) }
+    }
+
+    override fun allUsers(): List<User> = transaction(db){
+        UserEntries.alias("u2").let {
+            UserEntries.join(it, JoinType.LEFT, UserEntries.username, it[UserEntries.passwordHashed])
+//                .slice(UserEntries.username, it[UserEntries.username].count())
+                .selectAll()
+                .groupBy(UserEntries.username)
+                .orderBy(it[UserEntries.username].count(), SortOrder.ASC)
+                .map { entry -> User(entry[UserEntries.username], entry[UserEntries.passwordHashed]) }
+        }
     }
 
     override fun queryUser(username: String) = transaction(db) {

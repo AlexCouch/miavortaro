@@ -1,40 +1,26 @@
+package modaloj
+
+import alioj.Colors
 import csstype.*
-import csstype.Display.Companion.flex
 import emotion.react.css
-import kotlinx.browser.document
-import org.w3c.dom.HTMLDivElement
-import react.FC
-import react.Props
-import react.StateSetter
-import react.dom.html.InputType
+import react.*
 import react.dom.html.ReactHTML.button
 import react.dom.html.ReactHTML.div
-import react.dom.html.ReactHTML.form
-import react.dom.html.ReactHTML.html
 import react.dom.html.ReactHTML.i
-import react.dom.html.ReactHTML.input
-import react.dom.html.ReactHTML.label
 import react.dom.html.ReactHTML.p
 import react.dom.html.ReactHTML.span
-import react.useState
 
-external interface AldoniVortonProps: Props {
+external interface DialogoProps: PropsWithChildren {
     var show: Boolean
     var jeFermu: () -> Unit
-    var AldoniVortonFunc: (vorto: String, priparolo: String) -> Unit
+    var titolo: String
+    var butonoEtikedo: String
+    var butonoAlklako: ()->Unit
+    var korpo: ()->Unit
 }
 
-val AldoniVorton = FC<AldoniVortonProps>{ props ->
-    val (vorto, ĝisdatigiVorton) = useState<String>("")
-    val (priskribo, ĝisdatigiPriskribon) = useState<String>("")
-
+val Modalo = FC<DialogoProps>{ props ->
     div{
-        //Ĉi tiu enhavas vicojn kiuj enhavas la partojn de la tuta formo.
-        //Vico unua: La 'eks' marko kaj la titlo
-        //Vico dua: La enmetejo por la vorto
-        //Vico tria: La enmetejo por la priskribo de la vorto
-        //Vico kvara: La butono por sendi la vorton al la servo
-        id = "aldoniVorton"
         css{
             display = if(props.show) Display.block else None.none
             position = Position.fixed
@@ -61,8 +47,7 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
                 height = 75.pct
             }
             div{
-
-                //Jen la vico unua, en kiu ekzistas la 'eks' marko por fermi la formon
+                //Jen la kaplinio de la dialogo
                 css(ClassName("flex-container")){
                     width = 100.pct
                     display = Display.flex
@@ -70,7 +55,7 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
                 }
                 span{}
                 p{
-                    +"Aldoni vorton"
+                    +props.titolo
                     css{
                         color = Color(Colors.primaryFg)
                         fontSize = 24.px
@@ -90,14 +75,12 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
                         }
                     }
                     onClick = {
-                        ĝisdatigiVorton("")
-                        ĝisdatigiPriskribon("")
                         props.jeFermu()
                     }
                 }
             }
             div{
-                //Jen la vico dua, en kiu estas la enmetejo por la vorto
+                //Jen la korpo de la dialogo
                 css{
                     width = 100.pct
                     display = Display.flex
@@ -105,22 +88,7 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
                     justifyContent = JustifyContent.center
                     alignItems = AlignItems.center
                 }
-                Enmetejo{
-                    jeŜanĝo = {
-                        ĝisdatigiVorton(it)
-                    }
-                    etikedo = "Vorto"
-                    larĝo = 50.pct
-                    margin = Margin(10.px, Auto.auto)
-                }
-                Enmetejo{
-                    jeŜanĝo = {
-                        ĝisdatigiPriskribon(it)
-                    }
-                    etikedo = "Priskribo"
-                    larĝo = 50.pct
-                    margin = Margin(10.px, Auto.auto)
-                }
+                +props.children
             }
             div{
                 css(ClassName("flex-container")){
@@ -139,12 +107,10 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
                             boxShadow = BoxShadow(0.`in`, 0.`in`, 1.em, Color(Colors.highlight))
                         }
                     }
-                    +"Aldoni"
+                    +props.butonoEtikedo
 
                     onClick = {
-                        ĝisdatigiVorton("")
-                        ĝisdatigiPriskribon("")
-                        props.AldoniVortonFunc(vorto, priskribo)
+                        props.butonoAlklako()
                         props.jeFermu()
                     }
                 }

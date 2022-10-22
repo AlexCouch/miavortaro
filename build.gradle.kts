@@ -2,10 +2,10 @@ plugins {
     kotlin("multiplatform") version "1.7.10"
     application
     kotlin("plugin.serialization") version "1.7.10"
-    id("io.github.turansky.kfc.legacy-union") version "5.59.0"
+    id("io.ktor.plugin") version "2.1.2"
 }
 
-group = "com.miavortaro"
+group = "net.miavortaro"
 version = "1.0-SNAPSHOT"
 
 val ktorVersion = "2.1.0"
@@ -25,14 +25,14 @@ repositories {
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = "11"
         }
         withJava()
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
     }
-    js(LEGACY) {
+    js(IR) {
         binaries.executable()
         browser {
             commonWebpackConfig {
@@ -70,6 +70,8 @@ kotlin {
                 implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
                 implementation("io.ktor:ktor-server-conditional-headers:$ktorVersion")
                 implementation("io.ktor:ktor-server-freemarker:$ktorVersion")
+                implementation("io.ktor:ktor-server-auth:$ktorVersion")
+                implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
                 implementation("ch.qos.logback:logback-classic:1.2.11")
                 implementation("com.h2database:h2:2.1.212")
                 implementation("org.ehcache:ehcache:3.9.7")
@@ -91,6 +93,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
                 implementation("io.ktor:ktor-client-serialization:$ktorVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+                implementation(npm("hmacsha1", "1.0.0"))
             }
         }
         val jsTest by getting

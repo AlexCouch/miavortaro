@@ -6,6 +6,7 @@ import WordEntry
 import net.miavortaro.application.dao.DAOFacade
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.freemarker.*
 import io.ktor.server.html.*
 import io.ktor.server.locations.*
@@ -40,7 +41,7 @@ fun Routing.index(){
                     when (it["vortoj"]) {
                         null -> call.respond(
                             HttpStatusCode.BadRequest,
-                            "'vortoj' devas havi valaron, sed ĝi ne ja! Vidu la dokumentaĵon de la API por pli!"
+                            "'vortoj' devas havi valoron, sed ĝi ne ja! Vidu la dokumentaĵon de la API por pli!"
                         )
                         else -> {
                             call.respond(dao.searchWords(it["vortoj"]!!).map { word -> dao.getWord(word) }
@@ -62,16 +63,18 @@ fun Routing.index(){
             }
         }
     }
-    post<Index>{
-        call.receive<WordEntry>().let {
-            dao.createWord(it.word, it.definition)
+    authenticate("auth-jwt"){
+        post<Index>{
+            call.receive<WordEntry>().let {
+                dao.createWord(it.word, it.definition)
+            }
+            call.respond(HttpStatusCode.OK)
         }
-        call.respond(HttpStatusCode.OK)
-    }
-    delete<Index> {
-        call.receive<String>().let {
-            dao.deleteWord(it)
+        delete<Index> {
+            call.receive<String>().let {
+                dao.deleteWord(it)
+            }
+            call.respond(HttpStatusCode.OK)
         }
-        call.respond(HttpStatusCode.OK)
     }
 }

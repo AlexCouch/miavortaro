@@ -1,9 +1,10 @@
+package vidoj
+
+import alioj.Colors
 import csstype.*
-import csstype.Mask.Companion.alpha
 import emotion.react.css
 import react.FC
 import react.Props
-import react.TransitionFunction
 import react.dom.html.ReactHTML.div
 import react.dom.html.ReactHTML.li
 import react.dom.html.ReactHTML.p

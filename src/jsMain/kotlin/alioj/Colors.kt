@@ -1,3 +1,5 @@
+package alioj
+
 object Colors{
     val primaryBg = "#27362a"
     val onPrimaryBg = "#5c8264"

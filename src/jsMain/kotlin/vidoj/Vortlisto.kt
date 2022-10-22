@@ -1,3 +1,7 @@
+package vidoj
+
+import alioj.Colors
+import WordEntry
 import csstype.*
 import emotion.react.css
 import react.FC

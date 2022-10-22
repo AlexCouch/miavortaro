@@ -1,5 +1,7 @@
+package utiloj
+
+import alioj.Colors
 import csstype.*
-import emotion.css.css
 import emotion.react.css
 import react.FC
 import react.Props
@@ -14,6 +16,7 @@ external interface Enmetejaĵoj: Props{
     var margin: Margin
     var centra: Boolean
     var defaŭltaValoro: String
+    var estasPasvorto: Boolean
 }
 
 val Enmetejo = FC<Enmetejaĵoj>{ aĵoj ->
@@ -42,7 +45,7 @@ val Enmetejo = FC<Enmetejaĵoj>{ aĵoj ->
             }
             value = aĵoj.defaŭltaValoro
             placeholder = aĵoj.etikedo
-            type = InputType.text
+            type = if(aĵoj.estasPasvorto) InputType.password else InputType.text
         }
     }
 }

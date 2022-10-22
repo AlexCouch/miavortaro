@@ -1,3 +1,7 @@
+package vidoj
+
+import alioj.Colors
+import WordEntry
 import csstype.*
 import emotion.react.css
 import react.FC
@@ -8,6 +12,8 @@ import react.dom.html.ReactHTML.h1
 import react.dom.html.ReactHTML.label
 import react.dom.html.ReactHTML.p
 import react.useState
+import utiloj.Enmetejo
+import utiloj.MVButono
 
 external interface VidiVortonAĵoj: Props {
     var vorto: WordEntry

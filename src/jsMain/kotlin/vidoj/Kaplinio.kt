@@ -1,15 +1,21 @@
+package vidoj
+
+import alioj.Buttons
+import alioj.Colors
 import csstype.*
 import csstype.LineStyle.Companion.solid
 import emotion.react.css
 import react.FC
 import react.Props
 import react.dom.html.ReactHTML.div
-import react.dom.html.ReactHTML.span
 import react.useState
+import utiloj.Enmetejo
+import utiloj.MVButono
 
 external interface HeaderProps: Props{
     var onButtonClick: (String, Boolean) -> Unit
     var onSearchUpdate: (String)->Unit
+    var onLogin: (String)->Unit
 }
 
 val Header = FC<HeaderProps>{ props ->
@@ -42,9 +48,17 @@ val Header = FC<HeaderProps>{ props ->
         }
         MVButono{
             icon = "fa fa-plus"
-            fontSize = 1.em
+            fontSize = 1.2.em
             jeAlklako = {
                 props.onButtonClick(Buttons.AldoniButono, true)
+            }
+            margin = Margin(top = 0.px, bottom = 0.px, right = 1.em, left = 0.px)
+        }
+        MVButono{
+            icon = "fa fa-sign-in"
+            fontSize = 1.2.em
+            jeAlklako = {
+                props.onButtonClick(Buttons.EnsalutiButono, true)
             }
             margin = Margin(top = 0.px, bottom = 0.px, right = 1.em, left = 0.px)
         }

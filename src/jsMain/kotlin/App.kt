@@ -1,3 +1,4 @@
+import alioj.Buttons
 import csstype.*
 import emotion.react.css
 import io.ktor.client.*
@@ -8,8 +9,12 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import modaloj.AldoniVorton
+import modaloj.LoginModal
+import modaloj.RegisterModal
 import react.*
 import react.dom.html.ReactHTML.div
+import vidoj.*
 
 val httpClient = HttpClient{
     install(ContentNegotiation){
@@ -59,10 +64,46 @@ suspend fun addOrUpdateWord(word: WordEntry, updateAppState: StateSetter<AppStat
     }
 }
 
+//NOTE: This will return the token to be stored in a cookie
+suspend fun ensaluti(user: User, updateAppState: StateSetter<AppState>): String?{
+    httpClient.post("/ensaluti"){
+        headers{
+            contentType(ContentType.Application.Json)
+        }
+        setBody(user)
+    }.let { response ->
+        return if (response.status != HttpStatusCode.OK) {
+            updateAppState(AppState.Error(response.status, response.body()))
+            null
+        } else {
+            val tokenData = response.body<Map<String, String>>()
+            tokenData["token"]
+        }
+    }
+}
+
+suspend fun registri(user: User, updateAppState: StateSetter<AppState>): Boolean{
+    httpClient.post("/registri"){
+        headers{
+            contentType(ContentType.Application.Json)
+        }
+        setBody(user)
+    }.let { response ->
+        return if(response.status != HttpStatusCode.OK){
+            updateAppState(AppState.Error(response.status, response.status.description))
+            false
+        }else{
+            true
+        }
+    }
+}
+
 val App = FC<Props>{
     val (appState, updateAppState) = useState<AppState>(AppState.Load)
     val (words, updateWords) = useState<List<WordEntry>>(emptyList())
     val (showAddWordModal, shouldShowAddWordModal) = useState<Boolean>(false)
+    val (showLoginModal, shouldShowLoginModal) = useState<Boolean>(false)
+    val (showRegisterModal, shouldShowRegisterModal) = useState<Boolean>(false)
     val (showWord, shouldShowWord) = useState<Boolean>(false)
     val (wordToShow, setWordToShow) = useState<WordEntry>()
     val (changeWord, setChangeWord) = useState<Boolean>(false)
@@ -86,10 +127,66 @@ val App = FC<Props>{
                 }
             }
         }
+        LoginModal{
+            show = showLoginModal
+            jeFermu = {
+                shouldShowLoginModal(false)
+            }
+            Ensaluti = { uzantnomo, pasvorto ->
+                mainScope.launch{
+                    ensaluti(User(uzantnomo, pasvorto), updateAppState).let{ token ->
+                        //TODO:
+                        //  1. Validigi ĵetonon ja estas ne-nulo
+                        //  2. Stoki validigitan ĵetonon en kuketo esti reuzota
+                        //  3. Ĝisdatigi la staton de la apo por esti Ensalutita kaj montri la kontajn informojn en la kaplinio
+                        println(
+                            if(token != null){
+                                println("Token = $token")
+                            }else{
+                                println("Could not get a token.")
+                            }
+                        )
+                    }
+                }
+            }
+            malfermuRegistradanModalon = {
+                shouldShowLoginModal(false)
+                shouldShowRegisterModal(true)
+            }
+        }
+        RegisterModal{
+            show = showRegisterModal
+            jeFermu = {
+                shouldShowRegisterModal(false)
+            }
+            Registri = { uzantnomo, pasvorto ->
+                mainScope.launch{
+                    registri(User(uzantnomo, pasvorto), updateAppState).let{ result ->
+                        //TODO:
+                        //  1. Kontrolu la rezulton de la peto ĉu vera aŭ malvera
+                        //  2. Se vera, montru al la uzanto ke si povas ensaluti, aliflanke, montru eraron
+                        println(
+                            "Rezulto de la registrado: $result"
+                        )
+                    }
+                }
+            }
+            malfermuEnsalutadanModalon = {
+                shouldShowRegisterModal(false)
+                shouldShowLoginModal(true)
+            }
+        }
         Header {
             onButtonClick = { button, toggle ->
                 when (button) {
-                    Buttons.AldoniButono -> shouldShowAddWordModal(toggle)
+                    Buttons.AldoniButono -> {
+                        shouldShowAddWordModal(toggle)
+                        shouldShowLoginModal(false)
+                    }
+                    Buttons.EnsalutiButono -> {
+                        shouldShowLoginModal(toggle)
+                        shouldShowAddWordModal(false)
+                    }
                 }
             }
             onSearchUpdate = { word ->
@@ -109,6 +206,7 @@ val App = FC<Props>{
                         shouldShowWord(false)
                         setChangeWord(false)
                         println("Trying to close the view word window")
+                        updateAppState(AppState.Vortoj)
                         mainScope.launch {
                             getAllWords(updateWords)
                         }
