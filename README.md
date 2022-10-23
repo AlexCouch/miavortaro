@@ -2,7 +2,7 @@
 miavortaro estas nova apo vortara por ke, oni esperante povus serĉi, organizi, diskutadi, kaj voĉdoni por vortoj kiujn si konsideras precizaj.
 
 ## Kiel Kurigi
-Por kurigi la apon, oni devas fari la jenajn ŝtupojn:
+Por kurigi la apon, oni devas fari la jenajn paŝojn:
 
 
 1. Malfermi la projekton en Intellij IDEA de JetBrains (Community Edition)
