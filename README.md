@@ -19,3 +19,96 @@ Por kurigi la apon, oni devas fari la jenajn paŝojn:
 
 ## Dokumentaĵo de la kodo
 TODO: Skribi la dokumentaĵojn de la kodo
+
+## API
+
+### GET /?listo=N
+Tiu ĉi peto estas uzata por havigi la tutan vortaron *N* vortoj samtempe, kie *N* estas la nombro da vortoj por havigi.
+
+Peto:
+```
+HTTP/1.1 localhost:5000
+GET /?listo=10
+```
+
+Respondo:
+```
+HTTP/1.1 localhost:5000
+GET /?listo=10
+BODY
+[
+    {
+        "word": "dormi",
+        "definition": "Esti en tiu stato de korpa k intelekta senaktiveco, kiu ordinare okazas ĉiunokte k estas necesa por ripozigi la homojn k la bestojn"
+    },
+    {
+        "word": "dormo",
+        "definition": "Stato de dormanto"
+    },
+    {
+        "word": "enmeti",
+        "definition": "Meti en"
+    },
+    {
+        "word": "saluto",
+        "definition": "Ekstera signo de ĝentileco, kiun oni esprimas per vortoj aŭ movoj al renkontata persono"
+    }
+]
+```
+
+### POST /registri
+Tiu ĉi peto estas por krei novajn kontojn, sed oni devas uzi la Adminan konton por krei novajn kontojn (nuntempe). Ĉimaniere, ni povas regi la kontojn kaj kiu povas krei novajn kontojn. Por plu sciigi pri kontoj, vizitu [kontojn](#kontoj).
+
+Por uzi /registri ĝuste, oni devas sendi JSON mesaĝon kiu enhavas la detalojn de la konto, kiel jene:
+```
+HTTP localhost:5000
+GET /?registri
+
+BODY
+{
+    "uzantnomo": "uzanto",
+    "pasvorto": "pasvorto"
+}
+```
+
+***GRAVA REMARKO: NENIAM SENDU PETON AL ĈI TIU ITINERO PER HTTP, NURE UZU HTTPS, PRO LA SENSEKURECO DE HTTP. UZU HTTPS localhost:8443/?registri***
+
+## Kontoj
+Nune kontoj nur ekzistas kiel administraj kontoj, por aldoni, forigi, kaj ŝanĝi enigaĵojn. Nur la radika konto povas krei novajn kontojn. La kontojn permesas oni por sendi API-mesaĝojn kiuj postulas la ĵetonojn.
+
+Ĵetonoj estas kreataj per la tempo, uzantnomo, kaj pasvorto de la konto. Ili permesas ke, la uzanto (de la ĵetono) povu sendi mesaĝojn al la kutimaj malpermesataj vojoj de la servilo. Ekzemple, la vojo "HTTPS POST /", kiu postulas la korpon de la mesaĝo enhavas la informaĵon de la vorto, kiun ŝanĝas aŭ aldonas oni.
+
+Ekzemple:
+```
+Peto:
+POST / HTTP/1.1
+Host: localhost:8443
+Authorization: Bearer {ĵetono}
+...
+
+{
+    "vorto": "enmeti",
+    "priskribo": "Meti en"
+}
+
+Respondo:
+HTTP/1.1 200 OK
+...
+```
+
+Kutime, la ĵetonoj regule kaj ofte eksvalidiĝas por ke neniuj povus havigi ies ĵetonon kaj uzi ĝin por malbonajn agojn al la servilo. Remarkeble, la nuraj malbonaj aferoj kiujn oni povus fari per la ĵetono estas DDoS, sed ne longe, ĉar la ĵetono ja eksvalidiĝos mallonge kaj rapide, kutime post 3 minutoj.
+
+Por certigi ke la konto restas aktiva kaj valida, oni devas regule kaj ofte revalidigi la ĵetonojn. Tial kial oni devas uzi [oficiale subtenatajn librarojn](#oficialaj-libraroj) por simpligi la proceson.
+
+### La Proceso de la Validigado de Kontoj
+```
+   
+--------------------------------
+|    ^
+|    | peto
+|    |
+--------------------------------
+```
+
+## Oficialaj Libraroj
+Nenio ankoraŭ ekzistas :(

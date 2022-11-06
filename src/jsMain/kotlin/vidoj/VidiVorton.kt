@@ -60,7 +60,7 @@ val ViewWord = FC<VidiVortonAĵoj>{ aĵoj ->
                     jeAlklako = aĵoj.onClose
                     fontSize = 1.5.em
                 }
-                if(!aĵoj.changeWord){
+                /*if(!aĵoj.changeWord){
                     MVButono{
                         icon = "fa fa-edit"
                         jeAlklako = {
@@ -71,7 +71,7 @@ val ViewWord = FC<VidiVortonAĵoj>{ aĵoj ->
                         fontSize = 1.5.em
 
                     }
-                }
+                }*/
             }
             div{
                 css{

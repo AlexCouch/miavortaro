@@ -33,6 +33,7 @@ interface DAOFacade : Closeable{
     fun authUser(user: User): Boolean
     fun createUser(user: User): Boolean
     fun deleteUser(user: User): Boolean
+    fun deleteUserByName(user: String): Boolean
 
     fun clear()
 }
@@ -152,10 +153,19 @@ class DAOFacadeDatabase(
     }
 
     override fun deleteUser(user: User): Boolean = transaction(db) {
-        if(!queryUser(user.username)){
+        if(!authUser(user)){
             false
         }else{
-            UserEntries.deleteWhere { UserEntries.username.eq(user.username) }
+            UserEntries.deleteWhere { UserEntries.username eq user.username }
+            true
+        }
+    }
+
+    override fun deleteUserByName(user: String): Boolean = transaction(db){
+        if(!queryUser(user)){
+            false
+        }else{
+            UserEntries.deleteWhere { UserEntries.username eq user }
             true
         }
     }

@@ -2,5 +2,6 @@ package alioj
 
 object Buttons{
     val AldoniButono = "Aldoni"
-    val EnsalutiButono = "Ensaluti"
+    val MalfermiMenuon = "MalfermiMenuon"
+    val Ensaluti = "Ensaluti"
 }

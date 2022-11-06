@@ -7,6 +7,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import modaloj.AldoniVorton
@@ -42,7 +43,7 @@ suspend fun searchWord(word: String, setWords: StateSetter<List<WordEntry>>){
 
 suspend fun getAllWords(setWords: StateSetter<List<WordEntry>>){
     httpClient.get("/"){
-        parameter("ĉio", "vera")
+        parameter("listo", "10")
     }.let { response ->
         val body = response.body<List<WordEntry>>()
         setWords(body)
@@ -104,6 +105,7 @@ val App = FC<Props>{
     val (showAddWordModal, shouldShowAddWordModal) = useState<Boolean>(false)
     val (showLoginModal, shouldShowLoginModal) = useState<Boolean>(false)
     val (showRegisterModal, shouldShowRegisterModal) = useState<Boolean>(false)
+    val (malfermiMenuon, jaMalfermiMenuon) = useState<Boolean>(false)
     val (showWord, shouldShowWord) = useState<Boolean>(false)
     val (wordToShow, setWordToShow) = useState<WordEntry>()
     val (changeWord, setChangeWord) = useState<Boolean>(false)
@@ -177,14 +179,15 @@ val App = FC<Props>{
             }
         }
         Header {
+            this.malfermiMenuon = malfermiMenuon
             onButtonClick = { button, toggle ->
                 when (button) {
                     Buttons.AldoniButono -> {
                         shouldShowAddWordModal(toggle)
                         shouldShowLoginModal(false)
                     }
-                    Buttons.EnsalutiButono -> {
-                        shouldShowLoginModal(toggle)
+                    Buttons.MalfermiMenuon -> {
+                        jaMalfermiMenuon(toggle)
                         shouldShowAddWordModal(false)
                     }
                 }

@@ -9,18 +9,13 @@ import com.mchange.v2.c3p0.ComboPooledDataSource
 import net.miavortaro.application.dao.DAOFacade
 import net.miavortaro.application.dao.DAOFacadeCache
 import net.miavortaro.application.dao.DAOFacadeDatabase
-import freemarker.cache.ClassTemplateLoader
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import io.ktor.server.engine.*
-import io.ktor.server.freemarker.*
-import io.ktor.server.html.*
 import io.ktor.server.http.content.*
 import io.ktor.server.locations.*
-import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.conditionalheaders.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -31,11 +26,10 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import io.ktor.util.*
-import io.ktor.utils.io.core.*
-import io.netty.handler.codec.DefaultHeaders
-import kotlinx.html.*
+import net.miavortaro.application.itineroj.admin
+import net.miavortaro.application.itineroj.ensaluti
+import net.miavortaro.application.itineroj.registry
 import org.jetbrains.exposed.sql.Database
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.sql.Date
 import java.sql.Driver
@@ -77,6 +71,17 @@ fun createToken(audience: String, issuer: String, user: User, secret: String): S
         .withExpiresAt(Date(System.currentTimeMillis() + (30 * 60 * 1000)))
         .sign(Algorithm.HMAC256(secret))
 
+suspend fun ApplicationCall.verifyHTTPS(): Boolean =
+    if(this.request.local.scheme == "https"){
+        true
+    }else{
+        this.respond(HttpStatusCode.Forbidden, "Vi bezonas uzi HTTPS kaj ne HTTP")
+        false
+    }
+
+fun JWTPrincipal.verifyAdminToken(): Boolean =
+    this.payload.getClaim("username").asString() == "admin"
+
 fun Application.mainWithDependencies(dao: DAOFacade){
     install(DefaultHeaders)
     install(Locations)
@@ -107,12 +112,15 @@ fun Application.mainWithDependencies(dao: DAOFacade){
             )
 
             validate { credential ->
-                credential.payload.getClaim("username")?.asString()?.let { username ->
-                    if(username != "" && dao.queryUser(username)){
-                        JWTPrincipal(credential.payload)
-                    }else{
-                        null
+                with(credential){
+                    if(this.payload.expiresAt != null && this.payload.expiresAt.time.minus(System.currentTimeMillis()) > 0) {
+                        payload.getClaim("username")?.asString()?.let { username ->
+                            if (username != "" && dao.queryUser(username)) {
+                                return@with JWTPrincipal(credential.payload)
+                            }
+                        }
                     }
+                    null
                 }
             }
 
@@ -124,52 +132,9 @@ fun Application.mainWithDependencies(dao: DAOFacade){
 
     routing{
         index()
-        post("/registri"){
-            val user = call.receive<User>()
-            if(dao.queryUser(user.username)){
-                call.respond(HttpStatusCode.BadRequest, "Uzantnomo jam tenita")
-                return@post
-            }
-            dao.createUser(user)
-            call.respondRedirect("/")
-        }
-        post("/ensaluti"){
-            val user = call.receive<User>()
-            if(!dao.authUser(user)){
-                call.respond(HttpStatusCode.Forbidden, "Uzanto ne aŭtentikigita")
-                return@post
-            }
-            val token = createToken(audience, issuer, user, secret)
-            call.respond(mapOf("token" to token))
-        }
-        authenticate("auth-jwt") {
-            get("/admin"){
-                val principal = call.principal<JWTPrincipal>()
-                val username = principal!!.payload.getClaim("username").asString()
-                val expiresAt = principal.expiresAt?.time?.minus(System.currentTimeMillis())
-                call.respondText("Saluton, $username! La ĵetono eksvalidiĝas post $expiresAt ms.")
-            }
-            post("/admin"){
-                val principal = call.principal<JWTPrincipal>()
-                val username = principal!!.payload.getClaim("username").asString()
-                val password = principal.payload.getClaim("hashedPassword").asString()
-
-                val expiresAt = principal.expiresAt!!.time.minus(System.currentTimeMillis())
-                if(username != "admin"){
-                    call.respond("Nur admino povas atingi ĉi tiun itineron")
-                    return@post
-                }
-                if(expiresAt > 30 * 60 * 1000){
-                    call.respond("Ĵetono eksvalidiĝis")
-                    return@post
-                }
-                if(!dao.authUser(User(username, password))){
-                    call.respond("Admino ne plu aŭtentikigita")
-                    return@post
-                }
-                call.respond(dao.allUsers())
-            }
-        }
+        registry()
+        ensaluti(audience, issuer, secret)
+        admin()
         static("/static"){
             resources()
         }
