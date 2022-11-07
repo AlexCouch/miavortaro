@@ -101,14 +101,13 @@ Kutime, la ĵetonoj regule kaj ofte eksvalidiĝas por ke neniuj povus havigi ies
 Por certigi ke la konto restas aktiva kaj valida, oni devas regule kaj ofte revalidigi la ĵetonojn. Tial kial oni devas uzi [oficiale subtenatajn librarojn](#oficialaj-libraroj) por simpligi la proceson.
 
 ### La Proceso de la Validigado de Kontoj
-```
-   
---------------------------------
-|    ^
-|    | peto
-|    |
---------------------------------
-```
+![Ĵetono kaj Raktigo](dokoj/ĵetono_kaj_rajtigo_travidebla.png)
 
 ## Oficialaj Libraroj
-Nenio ankoraŭ ekzistas :(
+| Programa Lingvo | Statuso     | Loko                                       |
+|-----------------|-------------|--------------------------------------------|
+| Python          | Aktiva      | https://github.com/AlexCouch/miavortaro-py |
+| Kotlin          | Nekomencata | Nul                                        |
+
+### Rimarkoj pri la libraroj
+Oni ankoraŭ ne rajtas ke, si povu krei siajn proprajn eksterajn librarojn, ĉar mi devas fiksi kaj plibonigi multajn aliajn aferojn. Ankaŭ, mi devas finigi la tutan programan arkitekturon de la libraroj, por ke oni povas programi librarojn baze de la oficialaj libraroj, per komuna programa arkitekturo.
