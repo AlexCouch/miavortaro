@@ -56,25 +56,71 @@ BODY
 ]
 ```
 
-### POST /registri
-Tiu ĉi peto estas por krei novajn kontojn, sed oni devas uzi la Adminan konton por krei novajn kontojn (nuntempe). Ĉimaniere, ni povas regi la kontojn kaj kiu povas krei novajn kontojn. Por plu sciigi pri kontoj, vizitu [kontojn](#kontoj).
+### POST /
+Tiu ĉi peto estas por aldoni novajn vortojn, aŭ por ŝanĝi vortojn. La korpo de la peto devas enhavi la informon de la vorto ŝanĝata. Tiu ĉi peto ankaŭ postulas rajtigon de Admino.
 
-Por uzi /registri ĝuste, oni devas sendi JSON mesaĝon kiu enhavas la detalojn de la konto, kiel jene:
+Por uzi `POST /` ĝuste, oni devas sendi JSON mesaĝon jene:
+
 ```
-HTTP localhost:5000
-GET /?registri
+HTTP localhost:8443
+POST /
+Authorization: Bearer {token}
 
 BODY
 {
-    "uzantnomo": "uzanto",
-    "pasvorto": "pasvorto"
+    "word": {vorto},
+    "definition": {difino/priskribo}
 }
 ```
 
-***GRAVA REMARKO: NENIAM SENDU PETON AL ĈI TIU ITINERO PER HTTP, NURE UZU HTTPS, PRO LA SENSEKURECO DE HTTP. UZU HTTPS localhost:8443/?registri***
+En la proksima estonteco, ni havos kapablon por aldoni plurajn difinojn kaj ankaŭ tradukojn en diversaj linvoj, kaj ankaŭ gramatikajn rimarkojn kaj notojn.
+
+Oni ne devus zorgi pri la respondo, ĉar ĝi ja revenos malplena, krom la respondan kodon. Ĝi ja estu `200 OK`, kontraŭe ĝi diros al vi tion kio malĝustas de la peto.
+
+### POST /registri
+Tiu ĉi peto estas por krei novajn kontojn, sed oni devas uzi la Adminan konton por krei novajn kontojn (nuntempe). Tiamaniere, ni povas regi la kontojn kaj kiu povas krei novajn kontojn. Por plu sciiĝi pri kontoj, vizitu [kontojn](#kontoj).
+
+Por uzi `POST /registri` ĝuste, oni devas sendi JSON mesaĝon kiu enhavas la detalojn de la konto, kiel jene:
+```
+HTTP localhost:8443
+POST /?registri
+Authorization: Bearer {token}
+
+BODY
+{
+    "uzantnomo": {uzanto},
+    "pasvorto": {pasvorto}
+}
+```
+
+### POST /ensaluti
+Tiu ĉi peto estas por ensaluti per kontoj. Tiu ĉi donos al vi la ĵetonon uzi por la aliaj POST petoj, nome `POST /`, `GET/POST /admin`, ktp.
+
+```
+HTTP localhost:8443
+POST /?ensaluti
+
+BODY
+{
+    "uzantnomo": {uzanto},
+    "pasvorto": {pasvorto}
+}
+```
+
+Ĝi ja respondu al vi per la ĵetono, kiel jene:
+```
+HTTP/1.1 localhost:5000
+GET /?listo=10
+BODY
+{
+    "token": "{ĵetono}"
+}
+```
+
+Mi rekomendas konservi tiun ĵetonon ĝis la servilo diras al vi ke, la ĵetono eksvalidiĝis, tiam resendu la saman peton por akiri novan ĵetonon.
 
 ## Kontoj
-Nune kontoj nur ekzistas kiel administraj kontoj, por aldoni, forigi, kaj ŝanĝi enigaĵojn. Nur la radika konto povas krei novajn kontojn. La kontojn permesas oni por sendi API-mesaĝojn kiuj postulas la ĵetonojn.
+Nune kontoj nur ekzistas kiel administraj kontoj, por aldoni, forigi, kaj ŝanĝi enigaĵojn. Nur la Admina konto povas krei novajn kontojn. La kontojn permesas oni por sendi API-mesaĝojn kiuj postulas la ĵetonojn.
 
 Ĵetonoj estas kreataj per la tempo, uzantnomo, kaj pasvorto de la konto. Ili permesas ke, la uzanto (de la ĵetono) povu sendi mesaĝojn al la kutimaj malpermesataj vojoj de la servilo. Ekzemple, la vojo "HTTPS POST /", kiu postulas la korpon de la mesaĝo enhavas la informaĵon de la vorto, kiun ŝanĝas aŭ aldonas oni.
 
