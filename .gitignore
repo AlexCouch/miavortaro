@@ -2,3 +2,5 @@
 .gradle/
 build/
 .idea/
+keystore.jks
+kotlin-js-store
