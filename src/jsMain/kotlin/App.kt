@@ -5,6 +5,7 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.browser.window
@@ -41,16 +42,20 @@ suspend fun searchWord(word: String, setWords: StateSetter<List<WordEntry>>){
     }
 }
 
-suspend fun getAllWords(setWords: StateSetter<List<WordEntry>>){
+suspend fun getAllWords(komenco: Int, fino: Int, updateWords: (List<WordEntry>)->Unit): Boolean{
     httpClient.get("/"){
-        parameter("listo", "10")
+        parameter("tranĉi", "$komenco,$fino")
     }.let { response ->
+        if(response.bodyAsText() == "fine"){
+            return false
+        }
         val body = response.body<List<WordEntry>>()
-        setWords(body)
+        updateWords(body)
+        return true
     }
 }
 
-suspend fun addOrUpdateWord(word: WordEntry, updateAppState: StateSetter<AppState>, updateWords: StateSetter<List<WordEntry>>){
+suspend fun addOrUpdateWord(word: WordEntry, updateAppState: StateSetter<AppState>, updateWords: (List<WordEntry>)->Unit): Boolean{
     httpClient.post("/"){
         headers{
             contentType(ContentType.Application.Json)
@@ -60,9 +65,10 @@ suspend fun addOrUpdateWord(word: WordEntry, updateAppState: StateSetter<AppStat
         if (response.status != HttpStatusCode.OK) {
             updateAppState(AppState.Error(response.status, "Ho ve! Io okazis! Pardonu min! Vi povas reprovi poste!"))
         } else {
-            getAllWords(updateWords)
+            return getAllWords(0, 10, updateWords)
         }
     }
+    return true
 }
 
 //NOTE: This will return the token to be stored in a cookie
@@ -109,6 +115,9 @@ val App = FC<Props>{
     val (showWord, shouldShowWord) = useState<Boolean>(false)
     val (wordToShow, setWordToShow) = useState<WordEntry>()
     val (changeWord, setChangeWord) = useState<Boolean>(false)
+    val (scrollWordListStart, setScrollWordListStart) = useState<Int>(0)
+    val (scrollWordListEnd, setScrollWordListEnd) = useState<Int>(10)
+    val (fineDeLaListo, setFineDeLaListo) = useState<Boolean>(false)
 
     div {
         css(ClassName("flex-container")) {
@@ -125,7 +134,10 @@ val App = FC<Props>{
             }
             AldoniVortonFunc = { vorto, priskribo ->
                 mainScope.launch {
-                    addOrUpdateWord(WordEntry(vorto, priskribo), updateAppState, updateWords)
+                    addOrUpdateWord(WordEntry(vorto, priskribo), updateAppState){
+                        setFineDeLaListo(false)
+                        updateWords(it)
+                    }
                 }
             }
         }
@@ -195,7 +207,10 @@ val App = FC<Props>{
             onSearchUpdate = { word ->
                 mainScope.launch {
                     if (word.isEmpty()) {
-                        getAllWords(updateWords)
+                        getAllWords(0, 10){
+                            setFineDeLaListo(false)
+                            updateWords(it)
+                        }
                     } else {
                         searchWord(word, updateWords)
                     }
@@ -211,7 +226,10 @@ val App = FC<Props>{
                         println("Trying to close the view word window")
                         updateAppState(AppState.Vortoj)
                         mainScope.launch {
-                            getAllWords(updateWords)
+                            getAllWords(scrollWordListStart, scrollWordListEnd){
+                                setFineDeLaListo(false)
+                                updateWords(it)
+                            }
                         }
                     }
                 }
@@ -220,7 +238,12 @@ val App = FC<Props>{
         when (appState) {
             is AppState.Load -> {
                 mainScope.launch {
-                    getAllWords(updateWords)
+                    getAllWords(scrollWordListStart, scrollWordListEnd){
+                        setFineDeLaListo(false)
+                        updateWords(it)
+                    }
+                    setScrollWordListStart(scrollWordListStart + 10)
+                    setScrollWordListEnd(scrollWordListEnd + 10)
                     updateAppState(AppState.Vortoj)
                 }
             }
@@ -230,6 +253,18 @@ val App = FC<Props>{
                     onWordClick = {
                         setWordToShow(it)
                         shouldShowWord(true)
+                    }
+                    onScroll = {
+                        if(!fineDeLaListo){
+                            setScrollWordListStart(scrollWordListStart + 10)
+                            setScrollWordListEnd(scrollWordListEnd + 10)
+                            mainScope.launch{
+                                val rezulto = getAllWords(scrollWordListStart, scrollWordListEnd){
+                                    updateWords(words + it)
+                                }
+                                setFineDeLaListo(rezulto)
+                            }
+                        }
                     }
                 }
                 ViewWord {
@@ -248,7 +283,9 @@ val App = FC<Props>{
                     }
                     sendChangedWord = { word ->
                         mainScope.launch {
-                            addOrUpdateWord(word, updateAppState, updateWords)
+                            addOrUpdateWord(word, updateAppState){
+                                updateWords(it)
+                            }
                             setWordToShow(word)
                             setChangeWord(false)
                         }

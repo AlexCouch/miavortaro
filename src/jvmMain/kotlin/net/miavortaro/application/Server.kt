@@ -21,13 +21,13 @@ import io.ktor.server.plugins.conditionalheaders.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.partialcontent.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import io.ktor.util.*
 import net.miavortaro.application.itineroj.admin
 import net.miavortaro.application.itineroj.ensaluti
+import net.miavortaro.application.itineroj.index
 import net.miavortaro.application.itineroj.registry
 import org.jetbrains.exposed.sql.Database
 import java.io.File
@@ -67,7 +67,7 @@ fun createToken(audience: String, issuer: String, user: User, secret: String): S
         .withAudience(audience)
         .withIssuer(issuer)
         .withClaim("username", user.username)
-        .withClaim("hashedPassword", user.passwordHashed)
+        .withClaim("hashedPassword", user.password)
         .withExpiresAt(Date(System.currentTimeMillis() + (30 * 60 * 1000)))
         .sign(Algorithm.HMAC256(secret))
 
@@ -129,6 +129,8 @@ fun Application.mainWithDependencies(dao: DAOFacade){
             }
         }
     }
+
+    dao.createUser(User("Admin", "zamenhof7881"))
 
     routing{
         index()

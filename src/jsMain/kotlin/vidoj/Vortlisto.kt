@@ -15,6 +15,7 @@ import react.dom.html.ReactHTML.ul
 external interface WordListProps: Props {
     var words: List<WordEntry>
     var onWordClick: (WordEntry) -> Unit
+    var onScroll: ()->Unit
 }
 
 val WordList = FC<WordListProps>{ props ->
@@ -24,9 +25,17 @@ val WordList = FC<WordListProps>{ props ->
             width = 50.pct
             height = 100.pct - 3.em
             marginTop = 3.em
+            overflow = Overflow.scroll
 //            marginRight = 5.pct
         }
         if(props.words.isNotEmpty()) {
+            onScroll = {
+                it.currentTarget.let{ target ->
+                    if(target.scrollHeight - target.scrollTop == target.clientHeight.toDouble()){
+                        props.onScroll()
+                    }
+                }
+            }
             ul {
                 props.words.forEach { word ->
                     li {
