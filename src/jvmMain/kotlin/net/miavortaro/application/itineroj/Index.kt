@@ -1,9 +1,8 @@
 @file:OptIn(KtorExperimentalLocationsAPI::class)
 
-package net.miavortaro.application
+package net.miavortaro.application.itineroj
 
 import WordEntry
-import net.miavortaro.application.dao.DAOFacade
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -17,6 +16,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.html.*
+import net.miavortaro.application.Index
+import net.miavortaro.application.dao
 
 fun HTML.index(){
     head{
@@ -50,13 +51,28 @@ fun Routing.index(){
                         }
                     }
                 }
-                else if("listo" in it){
-                    if(it["listo"]?.all { char -> char.isDigit() } != null){
-                        val listoGrando = it["listo"]?.toInt() ?: 10
-                        val listo = dao.top(listoGrando).map { eniro -> dao.getWord(eniro) }.map { vorto -> WordEntry(vorto.word, vorto.description) }
-                        call.respond(listo)
-                    }else{
-                        call.respond(HttpStatusCode.BadRequest, "Atendis kvanton da vortoj per kiuj respondi")
+                else if("tranĉi" in it){
+                    it["tranĉi"]?.let{ tranĉi ->
+                        if("," !in tranĉi){
+                            call.respond(HttpStatusCode.BadRequest, "Atendis 'listo' havi du nomborjn, disigis de ',', senspace")
+                            return@get
+                        }
+                        val tranĉoj = tranĉi.split(',')
+                        if(tranĉoj.size != 2){
+                            call.respond(HttpStatusCode.BadRequest, "Atendis du nombrojn en 'listo' parametro, ne ${tranĉoj.size}")
+                            return@get
+                        }
+                        val (komenco, fino) = tranĉoj
+                        if(komenco.all { char -> char.isDigit() } && fino.all { char -> char.isDigit() }){
+                            val listo = dao.tranĉi(komenco.toInt(), fino.toInt()).map { eniro -> dao.getWord(eniro) }.map { vorto -> WordEntry(vorto.word, vorto.description) }
+                            if(listo.isEmpty()){
+                                call.respond("fine")
+                            }else{
+                                call.respond(listo)
+                            }
+                        }else{
+                            call.respond(HttpStatusCode.BadRequest, "Atendis kvanton da vortoj per kiuj respondi")
+                        }
                     }
                 } else{
                     call.respondHtml {
