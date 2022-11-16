@@ -1,13 +1,10 @@
+@file:Suppress("NonAsciiCharacters")
+
 package net.miavortaro.application.dao
 
 import User
-import WordEntry
 import net.miavortaro.application.model.WordEntryCache
-import kotlinx.coroutines.selects.select
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.neq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.notEqSubQuery
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.Closeable
 
@@ -22,7 +19,7 @@ interface DAOFacade : Closeable{
 
     fun searchWords(word: String): List<String>
 
-    fun top(amount: Int): List<String>
+    fun tranĉi(komenco: Int, fino: Int): List<String>
 
     fun all(): List<String>
 
@@ -74,14 +71,14 @@ class DAOFacadeDatabase(
         WordEntryCache(word, row[WordEntries.definition])
     }
 
-    override fun top(amount: Int): List<String> = transaction(db) {
+    override fun tranĉi(komenco: Int, fino: Int): List<String> = transaction(db) {
         WordEntries.alias("w2").let {
             WordEntries.join(it, JoinType.LEFT, WordEntries.word, it[WordEntries.definition])
-                .slice(WordEntries.word, it[WordEntries.word].count())
+                .slice(WordEntries.word, WordEntries.word)
                 .selectAll()
                 .groupBy(WordEntries.word)
-                .orderBy(it[WordEntries.word].count(), SortOrder.ASC)
-                .limit(amount)
+                .orderBy(WordEntries.word, SortOrder.ASC)
+                .limit(if(fino == komenco) 1 else fino - komenco, komenco.toLong())
                 .map { entry -> entry[WordEntries.word] }
         }
     }
@@ -136,7 +133,7 @@ class DAOFacadeDatabase(
 
     override fun authUser(user: User): Boolean = transaction(db) {
         UserEntries.select {
-            (UserEntries.username eq user.username) and (UserEntries.passwordHashed eq user.passwordHashed)
+            (UserEntries.username eq user.username) and (UserEntries.passwordHashed eq user.password)
         }.any()
     }
 
@@ -146,7 +143,7 @@ class DAOFacadeDatabase(
         }else{
             UserEntries.insert {
                 it[UserEntries.username] = user.username
-                it[UserEntries.passwordHashed] = user.passwordHashed
+                it[UserEntries.passwordHashed] = user.password
             }
             true
         }

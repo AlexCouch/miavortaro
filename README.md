@@ -14,44 +14,69 @@ Por kurigi la apon, oni devas fari la jenajn paŝojn:
    a. La havenoj, kiuj konektebliĝas, estas 5000 (HTTP) kaj 8443 (HTTPS) se ĉio estas en ordo
 5. Konekti al la HTTP aŭ HTTPS havenoj por testi ilin
     Rem: Kiam vi konektas al HTTPS, via retumilo eble diras al vi, ke la retejo estas malsekura. Ĉio, kion vi devas fari estas:
-        1. Alklaki "Altnivela" aŭ "Advanced" angle
-        2. Alklaki "Procedi..."
+        1. Alklaki "Spertula" aŭ "Advanced" angle
+        2. Alklaki "Akcepti la riskon kaj daŭrigi..."
 
 ## Dokumentaĵo de la kodo
 TODO: Skribi la dokumentaĵojn de la kodo
 
 ## API
 
-### GET /?listo=N
-Tiu ĉi peto estas uzata por havigi la tutan vortaron *N* vortoj samtempe, kie *N* estas la nombro da vortoj por havigi.
+### GET /?tranĉi=N,M
+Tiu ĉi peto estas uzata por havigi la tutan vortaron, tranĉite de *N* ĝis *M* indeksoj, 
+kie *N* estas la indekso de la komenco de la listo, kaj *M* estas la indekso de la fino de la listo.
 
 Peto:
 ```
 HTTP/1.1 localhost:5000
-GET /?listo=10
+GET /?tranĉi=0,10
 ```
 
 Respondo:
 ```
 HTTP/1.1 localhost:5000
-GET /?listo=10
+GET /?tranĉi=0,10
 BODY
 [
     {
-        "word": "dormi",
-        "definition": "Esti en tiu stato de korpa k intelekta senaktiveco, kiu ordinare okazas ĉiunokte k estas necesa por ripozigi la homojn k la bestojn"
+        "word": "akvo",
+        "definition": "Likva kombinaĵo de hidrogeno k oksigeno, H2O"
     },
     {
-        "word": "dormo",
-        "definition": "Stato de dormanto"
+        "word": "besto",
+        "definition": "Ĉiu animalo escepte de homo: hejma, sovaĝa besto"
+    },
+    {
+        "word": "diri",
+        "definition": "Voĉe komuniki sencohavajn vortojn"
     },
     {
         "word": "enmeti",
         "definition": "Meti en"
     },
     {
-        "word": "saluto",
-        "definition": "Ekstera signo de ĝentileco, kiun oni esprimas per vortoj aŭ movoj al renkontata persono"
+        "word": "homo",
+        "definition": "de mamuloj, karakterizata de vertikala teniĝo, forte evoluinta cerbo k parolkapablo"
+    },
+    {
+        "word": "iri",
+        "definition": "Moviĝi per la tiucelaj membroj, piedoj, flugiloj, naĝiloj"
+    },
+    {
+        "word": "komputilo",
+        "definition": "Aparato, kiu aŭtomate prilaboras datenojn laŭ instrukcioj"
+    },
+    {
+        "word": "lando",
+        "definition": "Parto de la tersurfaco, rigardata kiel geografia apartaĵo"
+    },
+    {
+        "word": "ludi",
+        "definition": "Vigle, libere, kaprice, sencele sin movi tien k reen en vivoĝojo"
+    },
+    {
+        "word": "mano",
+        "definition": "Ekstrema, artikigita parto de la brako de homo aŭ de simio, havanta kvin fingrojn, el kiuj unu estas kontraŭmetebla al la ceteraj"
     }
 ]
 ```
