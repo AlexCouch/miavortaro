@@ -47,6 +47,15 @@ class DAOFacadeCache(val delegate: DAOFacade, val storagePath: File): DAOFacade 
             }
         }
 
+    override fun deleteWord(word: String) =
+        vortaroMemoreto.find { it.key == word }.let{
+            if(it == null){
+                delegate.deleteWord(word)
+            }else{
+                vortaroMemoreto.remove(word)
+            }
+        }
+
     override fun close() =
         cacheManager.use { cacheManager ->
             delegate.close()

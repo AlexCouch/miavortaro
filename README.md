@@ -102,6 +102,18 @@ En la proksima estonteco, ni havos kapablon por aldoni plurajn difinojn kaj anka
 
 Oni ne devus zorgi pri la respondo, ĉar ĝi ja revenos malplena, krom la respondan kodon. Ĝi ja estu `200 OK`, kontraŭe ĝi diros al vi tion kio malĝustas de la peto.
 
+## DELETE /
+Por forigi vortojn, oni povus uzi la DELETEan peton radike, per la rajtigo
+
+```
+HTTP localhost:8443
+DELETE /
+Authorization: Bearer {token}
+
+BODY
+enmeti
+```
+
 ### POST /registri
 Tiu ĉi peto estas por krei novajn kontojn, sed oni devas uzi la Adminan konton por krei novajn kontojn (nuntempe). Tiamaniere, ni povas regi la kontojn kaj kiu povas krei novajn kontojn. Por plu sciiĝi pri kontoj, vizitu [kontojn](#kontoj).
 
@@ -135,7 +147,7 @@ BODY
 Ĝi ja respondu al vi per la ĵetono, kiel jene:
 ```
 HTTP/1.1 localhost:5000
-GET /?listo=10
+GET /?ensaluti
 BODY
 {
     "token": "{ĵetono}"
@@ -167,12 +179,12 @@ HTTP/1.1 200 OK
 ...
 ```
 
-Kutime, la ĵetonoj regule kaj ofte eksvalidiĝas por ke neniuj povus havigi ies ĵetonon kaj uzi ĝin por malbonajn agojn al la servilo. Remarkeble, la nuraj malbonaj aferoj kiujn oni povus fari per la ĵetono estas DDoS, sed ne longe, ĉar la ĵetono ja eksvalidiĝos mallonge kaj rapide, kutime post 3 minutoj.
+Kutime, la ĵetonoj regule kaj ofte eksvalidiĝas por ke neniuj povus havigi ies ĵetonon kaj uzi ĝin por malbonaj agojn al la servilo. Rimarkeble, la nuraj malbonaj aferoj kiujn oni povus fari per la ĵetono estas DDoS, sed ne longe, ĉar la ĵetono ja eksvalidiĝos mallonge kaj rapide, kutime post 3 minutoj.
 
-Por certigi ke la konto restas aktiva kaj valida, oni devas regule kaj ofte revalidigi la ĵetonojn. Tial kial oni devas uzi [oficiale subtenatajn librarojn](#oficialaj-libraroj) por simpligi la proceson.
+Por certigi ke la konto restas aktiva kaj valida, oni devas regule kaj ofte revalidigi la ĵetonojn. Tial oni devas uzi [oficiale subtenatajn librarojn](#oficialaj-libraroj) por simpligi la proceson.
 
 ### La Proceso de la Validigado de Kontoj
-![Ĵetono kaj Raktigo](dokoj/ĵetono_kaj_rajtigo_travidebla.png)
+![Ĵetono kaj Rajtigo](dokoj/ĵetono_kaj_rajtigo_travidebla.png)
 
 ## Oficialaj Libraroj
 | Programa Lingvo | Statuso     | Loko                                       |
@@ -181,4 +193,4 @@ Por certigi ke la konto restas aktiva kaj valida, oni devas regule kaj ofte reva
 | Kotlin          | Nekomencata | Nul                                        |
 
 ### Rimarkoj pri la libraroj
-Oni ankoraŭ ne rajtas ke, si povu krei siajn proprajn eksterajn librarojn, ĉar mi devas fiksi kaj plibonigi multajn aliajn aferojn. Ankaŭ, mi devas finigi la tutan programan arkitekturon de la libraroj, por ke oni povas programi librarojn baze de la oficialaj libraroj, per komuna programa arkitekturo.
+Oni ankoraŭ ne rajtas krei siajn proprajn eksterajn librarojn, ĉar mi devas fiksi kaj plibonigi multajn aliajn aferojn. Ankaŭ, mi devas finigi la tutan programan arkitekturon de la libraroj, por ke oni povas programi librarojn baze de la oficialaj libraroj, per komuna programa arkitekturo.
