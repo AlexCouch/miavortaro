@@ -102,7 +102,7 @@ En la proksima estonteco, ni havos kapablon por aldoni plurajn difinojn kaj anka
 
 Oni ne devus zorgi pri la respondo, ĉar ĝi ja revenos malplena, krom la respondan kodon. Ĝi ja estu `200 OK`, kontraŭe ĝi diros al vi tion kio malĝustas de la peto.
 
-## DELETE /
+### DELETE /
 Por forigi vortojn, oni povus uzi la DELETEan peton radike, per la rajtigo
 
 ```
