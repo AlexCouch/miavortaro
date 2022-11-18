@@ -81,6 +81,21 @@ BODY
 ]
 ```
 
+### GET /?vortoj=V
+Tiu ĉi peto estas uzata por serĉi vortojn per iu(j) litero(j) sekva(j). La sola parametro estas "vortoj", kaj ĝi uzas `V`, kiu estas la vorto, kiun uzas oni por serĉi ĉiuj vortojn kiuj kongruas ĝin
+
+```
+HTTP/1.1 localhost:5000
+GET /?vortoj=en
+BODY
+[
+    {
+        "word": "enmeti",
+        "definition": "Meti en"
+    }
+]
+```
+
 ### POST /
 Tiu ĉi peto estas por aldoni novajn vortojn, aŭ por ŝanĝi vortojn. La korpo de la peto devas enhavi la informon de la vorto ŝanĝata. Tiu ĉi peto ankaŭ postulas rajtigon de Admino.
 
