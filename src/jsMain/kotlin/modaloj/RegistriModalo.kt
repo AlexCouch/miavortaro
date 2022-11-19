@@ -1,6 +1,6 @@
 package modaloj
 
-import utiloj.Enmetejo
+import utiloj.SerĉBreto
 import csstype.Auto
 import csstype.Margin
 import csstype.pct
@@ -35,7 +35,7 @@ val RegisterModal = FC<RegisterModalProps>{ props ->
             metuPasvorton("")
             props.Registri(uzantnomo, pasvorto)
         }
-        Enmetejo{
+        SerĉBreto{
             jeŜanĝo = {
                 metuUzantnomon(it)
             }
@@ -43,7 +43,7 @@ val RegisterModal = FC<RegisterModalProps>{ props ->
             larĝo = 50.pct
             margin = Margin(10.px, Auto.auto)
         }
-        Enmetejo{
+        SerĉBreto{
             jeŜanĝo = {
                 metuPasvorton(it)
             }

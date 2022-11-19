@@ -1,6 +1,5 @@
 package vidoj
 
-import alioj.Buttons
 import alioj.Colors
 import csstype.*
 import csstype.LineStyle.Companion.solid
@@ -8,13 +7,8 @@ import emotion.react.css
 import react.FC
 import react.Props
 import react.dom.html.ReactHTML.div
-import react.dom.html.ReactHTML.i
-import react.dom.html.ReactHTML.li
-import react.dom.html.ReactHTML.span
-import react.dom.html.ReactHTML.ul
 import react.useState
-import utiloj.Enmetejo
-import utiloj.MVButono
+import utiloj.SerĉBreto
 
 external interface HeaderProps: Props{
     var malfermiMenuon: Boolean
@@ -42,7 +36,7 @@ val Header = FC<HeaderProps>{ props ->
             borderBottomStyle = solid
         }
 
-        Enmetejo{
+        SerĉBreto{
             jeŜanĝo = {
                 props.onSearchUpdate(it)
             }

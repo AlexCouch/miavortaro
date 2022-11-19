@@ -1,6 +1,6 @@
 package modaloj
 
-import utiloj.Enmetejo
+import utiloj.SerĉBreto
 import csstype.Auto
 import csstype.Margin
 import csstype.pct
@@ -33,7 +33,7 @@ val LoginModal = FC<LoginModalProps>{ props ->
         butonoAlklako = {
             props.Ensaluti(uzantnomo, pasvorto)
         }
-        Enmetejo{
+        SerĉBreto{
             jeŜanĝo = {
                 metuUzantnomon(it)
             }
@@ -41,7 +41,7 @@ val LoginModal = FC<LoginModalProps>{ props ->
             larĝo = 50.pct
             margin = Margin(10.px, Auto.auto)
         }
-        Enmetejo{
+        SerĉBreto{
             jeŜanĝo = {
                 metuPasvorton(it)
             }

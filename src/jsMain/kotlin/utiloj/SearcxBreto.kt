@@ -9,7 +9,7 @@ import react.dom.html.InputType
 import react.dom.html.ReactHTML.form
 import react.dom.html.ReactHTML.input
 
-external interface Enmetejaĵoj: Props{
+external interface SerĉBretaAĵoj: Props{
     var jeŜanĝo: (String)->Unit
     var larĝo: Length
     var etikedo: String
@@ -19,13 +19,17 @@ external interface Enmetejaĵoj: Props{
     var estasPasvorto: Boolean
 }
 
-val Enmetejo = FC<Enmetejaĵoj>{ aĵoj ->
+val SerĉBreto = FC<SerĉBretaAĵoj>{ aĵoj ->
     form{
         css(ClassName("flex-container")){
             display = Display.flex
             justifyContent = if(aĵoj.centra) JustifyContent.center else JustifyContent.normal
             alignContent = if(aĵoj.centra) AlignContent.center else AlignContent.normal
             width = 100.pct
+        }
+
+        onSubmit = {
+            it.preventDefault()
         }
         input{
             css{
@@ -46,6 +50,7 @@ val Enmetejo = FC<Enmetejaĵoj>{ aĵoj ->
             value = aĵoj.defaŭltaValoro
             placeholder = aĵoj.etikedo
             type = if(aĵoj.estasPasvorto) InputType.password else InputType.text
+
         }
     }
 }

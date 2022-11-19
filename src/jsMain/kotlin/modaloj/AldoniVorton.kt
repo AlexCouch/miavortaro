@@ -1,6 +1,6 @@
 package modaloj
 
-import utiloj.Enmetejo
+import utiloj.SerĉBreto
 import csstype.*
 import react.FC
 import react.Props
@@ -30,7 +30,7 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
             ĝisdatigiPriskribon("")
             props.AldoniVortonFunc(vorto, priskribo)
         }
-        Enmetejo{
+        SerĉBreto{
             jeŜanĝo = {
                 ĝisdatigiVorton(it)
             }
@@ -38,7 +38,7 @@ val AldoniVorton = FC<AldoniVortonProps>{ props ->
             larĝo = 50.pct
             margin = Margin(10.px, Auto.auto)
         }
-        Enmetejo{
+        SerĉBreto{
             jeŜanĝo = {
                 ĝisdatigiPriskribon(it)
             }

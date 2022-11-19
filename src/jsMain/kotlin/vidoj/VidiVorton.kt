@@ -12,7 +12,7 @@ import react.dom.html.ReactHTML.h1
 import react.dom.html.ReactHTML.label
 import react.dom.html.ReactHTML.p
 import react.useState
-import utiloj.Enmetejo
+import utiloj.SerĉBreto
 import utiloj.MVButono
 
 external interface VidiVortonAĵoj: Props {
@@ -88,7 +88,7 @@ val ViewWord = FC<VidiVortonAĵoj>{ aĵoj ->
                             color = Color(Colors.primaryFg)
                         }
                     }
-                    Enmetejo{
+                    SerĉBreto{
                         jeŜanĝo = {
                             metuNovaVorto(it)
                         }
@@ -117,7 +117,7 @@ val ViewWord = FC<VidiVortonAĵoj>{ aĵoj ->
                     }
                 }
                 if(aĵoj.changeWord){
-                    Enmetejo{
+                    SerĉBreto{
                         jeŜanĝo = {
                             metuNovaPriskribo(it)
                         }
