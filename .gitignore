@@ -4,3 +4,4 @@ build/
 .idea/
 keystore.jks
 kotlin-js-store
+skriboj/skriboj_venv
