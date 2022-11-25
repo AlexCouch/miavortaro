@@ -22,12 +22,37 @@ fun Routing.admin(){
     authenticate("auth-jwt") {
         get<Admino>{
             if(call.verifyHTTPS()){
-                val principal = call.principal<JWTPrincipal>()
-                val username = principal!!.payload.getClaim("username").asString()
-                val expiresAt = principal.expiresAt?.time?.minus(System.currentTimeMillis())
-                call.respondText("Saluton, $username! La ĵetono eksvalidiĝas post $expiresAt ms.")
+                //Se la rektoro (Principal) ne estas nulo, tiam oni uzu ĝin
+                call.principal<JWTPrincipal>()?.let{ principal ->
+                    val username = principal.payload.getClaim("username").asString()
+                    val expiresAt = principal.expiresAt?.time?.minus(System.currentTimeMillis())
+                    //Kontrolu la validecon de la ĵetono
+                    expiresAt?.let{
+                        if(it <= 0){
+                            call.respond(HttpStatusCode.Unauthorized, "Ĵetono malvalidiĝis")
+                            return@get
+                        }
+                    }
+                    //Kontrolu se la uzantnomo estas "Admin"
+                    if(username != "Admin"){
+                        call.respond(HttpStatusCode.Unauthorized, "Uzanto ne rajtigis")
+                        return@get
+                    }
+                    //Alie, respondu OK
+                    //TODO: Ni devas respondi kun la adminaj informaĵoj por ke la uzanto povas iel uzi la statistikojn
+                    call.respond(HttpStatusCode.OK)
+                    return@get
+                }
+                //Alie, respondu BadRequest
+                call.respond(HttpStatusCode.BadRequest, "Konto ne rajtigita")
             }
         }
+        /* TODO: Ni devas modifi la POST-an adminan vojon por ke oni povas sendi JSON-an objekton por aldoni aŭ ŝanĝi informaĵojn
+           Ekzemple:
+            1. Aldoni/Ŝanĝi vortojn, kaj la ĉiuj aliaj informaĵoj de vortoj
+            2. Vidi la statistikojn de la interagoj al la servilo (kiom da vidoj de vortoj, ktp)
+            3. Krei novajn adminajn kontojn
+         */
         post<Admino>{
             if(call.verifyHTTPS()) {
                 val principal = call.principal<JWTPrincipal>()
